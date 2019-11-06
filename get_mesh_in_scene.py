@@ -26,17 +26,20 @@ while not dagIterator.isDone():
             bbox = dag.boundingBox
             #min = om.MPoint(bbox.min) * om.MDagPath().exclusiveMatrix()
             #max = om.MPoint(bbox.max) * om.MDagPath().exclusiveMatrix()
-            ini_dict.update( {name : bbox} )
-
+            ini_dict.update( {name : str(bbox)} )
+            
     dagIterator.next()
 
-def remove_duplicates(input_dict):
-	output_dict = {}
-	for key,value in input_dict.items():
-		if value not in output_dict.values():
-			output_dict[key] = value
-	return output_dict	
-
-print remove_duplicates(ini_dict)
-
- 
+# finding duplicate values 
+# from dictionary 
+# using a naive approach 
+rev_dict = {} 
+  
+for key, value in ini_dict.items(): 
+    rev_dict.setdefault(value, set()).add(key) 
+      
+result = [key for key, values in rev_dict.items() 
+                              if len(values) > 1] 
+  
+# printing result 
+print("duplicate values", str(result)) 
