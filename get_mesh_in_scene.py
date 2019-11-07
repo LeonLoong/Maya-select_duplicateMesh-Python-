@@ -130,9 +130,13 @@ def checkDoubleMesh(dagPath1, dagPath2):
     # compare the bounding boxes to identify double mesh cases
     if (min1.isEquivalent(min2, tol) and max1.isEquivalent(max2, tol)):
         om.MGlobal.displayInfo("Duplicate Mesh detected")
-        #om.MGlobal.displayInfo(dagPath1.fullPathName())
-        #om.MGlobal.displayInfo(dagPath2.fullPathName())
+        om.MGlobal.displayInfo(dagPath1.fullPathName())
+        om.MGlobal.displayInfo(dagPath2.fullPathName())
         return 1
     else:
         return 0
+
+import time
+start_time = time.time()
 doIt()
+print("--- %s seconds ---" % (time.time() - start_time))
