@@ -1,20 +1,12 @@
-import maya.api.OpenMaya as newOM
-import maya.OpenMaya as oldOM
+import maya.api.OpenMaya as om
 import pymel.core as pm
+from itertools import chain 
 
-#selectionList  = newOM.MGlobal.getActiveSelectionList()
-mObject_list = newOM.MSelectionList()
-
-dagIterator = newOM.MItDag( newOM.MItDag.kDepthFirst, newOM.MFn.kMesh )
-
-mSelectionList = oldOM.MSelectionList()
-selDagPath = oldOM.MDagPath()
-childSelList = oldOM.MSelectionList()
-
+dagIterator = om.MItDag( om.MItDag.kDepthFirst, om.MFn.kInvalid  )
 
 # This reference to the MFnDagNode function set will be needed
 # to obtain information about the DAG objects.
-dagNodeFn = newOM.MFnDagNode()
+dagNodeFn = om.MFnDagNode()
 
 # empty dictionary 
 ini_dict = {} 
@@ -25,49 +17,31 @@ while not dagIterator.isDone():
     dagObject = dagIterator.currentItem()
             
     # Make our MFnDagNode function set operate on the current DAG object.
-    dagNodeFn.setObject( dagObject )
+    dagNodeFn.setObject( dagObject  )
                        
     # Extract the DAG object's name.
     name = dagNodeFn.name()
     
-    mSelectionList.add(dagIterator.fullPathName())
-    
-    if dagObject.apiType() == newOM.MFn.kMesh:
-        mfn_mesh = newOM.MFnMesh( dagObject )
-        
-        dag = newOM.MFnDagNode( dagObject )
+    if dagObject.apiType() == om.MFn.kTransform:
+        dag = om.MFnDagNode( dagObject )
         bbox = dag.boundingBox
-        min = newOM.MPoint(bbox.min) * newOM.MDagPath().exclusiveMatrix()
-        max = newOM.MPoint(bbox.max) * newOM.MDagPath().exclusiveMatrix()
-        #print name, bbox, min, max
-        ini_dict.update( {name : str(bbox)} ) 
+        min = om.MPoint(bbox.min) * om.MDagPath().exclusiveMatrix()
+        max = om.MPoint(bbox.max) * om.MDagPath().exclusiveMatrix()
+        ini_dict.update( {name : str( min ) + str( max )} ) 
 
             
     # Iterate to the next item.
     dagIterator.next()
 
-dagPath = oldOM.MDagPath()
-tol = 0.01
-for i in range( mSelectionList.length()):
-    mSelectionList.getDagPath(i, dagPath)
-    if dagPath.apiType() == oldOM.MFn.kMesh:
-        dagFn = oldOM.MFnDagNode(dagPath)
-        bbox = oldOM.MBoundingBox(dagFn.boundingBox())
-        min = oldOM.MPoint(bbox.min()) * dagPath.exclusiveMatrix()
-        max = oldOM.MPoint(bbox.max()) * dagPath.exclusiveMatrix()
-        bBoxWorld = oldOM.MBoundingBox(min, max)
-        om.MGlobal.displayInfo(dagPath.fullPathName())
-
-
 # finding duplicate values 
-# from dictionary 
-# using a naive approach 
+# from dictionary using set 
 rev_dict = {} 
-  
 for key, value in ini_dict.items(): 
     rev_dict.setdefault(value, set()).add(key) 
-      
-result = [key for key, values in rev_dict.items() if len(values) > 1] 
   
-# printing result 
-#print("duplicate values", str(result)) 
+  
+result = set(chain.from_iterable( values for key, values in rev_dict.items() if len(values) > 1)) 
+  
+# Iterating using for loop 
+for key in result: 
+    cmds.select( key, add = True ) 
