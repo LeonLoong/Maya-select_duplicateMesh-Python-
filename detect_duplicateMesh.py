@@ -135,8 +135,3 @@ def checkDoubleMesh(dagPath1, dagPath2):
         return 1
     else:
         return 0
-
-import time
-start_time = time.time()
-doIt()
-print("--- %s seconds ---" % (time.time() - start_time))
