@@ -18,31 +18,31 @@ def doIt():
     		dagIterator.next()
     
     
-    		# if mesh found in scene
-    		if mSelectionList.length() is not 0:
-    		    iterateFn(mSelectionList)
-    		else:
-    		    om.MGlobal.displayInfo("No Mesh present in the scene !!")
+		# if mesh found in scene
+		if mSelectionList.length() is not 0:
+		    iterateFn(mSelectionList)
+		else:
+		    om.MGlobal.displayInfo("No Mesh present in the scene !!")
     
-    	# if user has selected a group of mesh
-    	else: 
-    		selDagPath = om.MDagPath()
-    		childSelList = om.MSelectionList()
-    
-    		for i in range(mSelectionList.length()): 
-    			mSelectionList.getDagPath(i, selDagPath)
-    
-    			# select all children shapes
-    			dagIterator.reset(selDagPath, om.MItDag.kDepthFirst, om.MFn.kMesh)
-    			while not dagIterator.isDone():
-    				# avoiding intermediate objects
-    				mfnDagNode = om.MFnDagNode(dagIterator.currentItem())
-    				if not mfnDagNode.isIntermediateObject():
-    				    childSelList.add(dagIterator.fullPathName())
-    
-    				dagIterator.next()
-    
-    		iterateFn(childSelList)
+	# if user has selected a group of mesh
+	else: 
+		selDagPath = om.MDagPath()
+		childSelList = om.MSelectionList()
+
+		for i in range(mSelectionList.length()): 
+			mSelectionList.getDagPath(i, selDagPath)
+
+			# select all children shapes
+			dagIterator.reset(selDagPath, om.MItDag.kDepthFirst, om.MFn.kMesh)
+			while not dagIterator.isDone():
+				# avoiding intermediate objects
+				mfnDagNode = om.MFnDagNode(dagIterator.currentItem())
+				if not mfnDagNode.isIntermediateObject():
+				    childSelList.add(dagIterator.fullPathName())
+
+				dagIterator.next()
+
+		iterateFn(childSelList)
 
 ###################################################################################
 ### This function iterates through the selectionList passed to it.		           ###
